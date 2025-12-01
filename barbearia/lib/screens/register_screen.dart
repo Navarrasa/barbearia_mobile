@@ -23,7 +23,8 @@ class _LoginRegisterScreenState extends State<LoginRegisterScreen> {
       backgroundColor: const Color(0xFF1d2647),
       body: Center(
         child: Container(
-          width: 380,
+          width: MediaQuery.of(context).size.width * 0.80,
+          height: MediaQuery.of(context).size.height * 0.90,
           padding: const EdgeInsets.all(28),
           decoration: BoxDecoration(
             color: Colors.white,
@@ -43,10 +44,9 @@ class _LoginRegisterScreenState extends State<LoginRegisterScreen> {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: Colors.amber[600],
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: const Icon(Icons.cut, size: 32, color: Colors.black),
+                child: Image.asset("assets/logo.jpg",width: 120)
               ),
 
               const SizedBox(height: 16),
@@ -160,8 +160,8 @@ class _LoginRegisterScreenState extends State<LoginRegisterScreen> {
 
               // -------- BUTTON -------
               SizedBox(
-                width: double.infinity,
-                height: 48,
+                width: MediaQuery.of(context).size.width * 0.80,
+                height: MediaQuery.of(context).size.height * 0.06,
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.amber[700],
@@ -169,19 +169,41 @@ class _LoginRegisterScreenState extends State<LoginRegisterScreen> {
                       borderRadius: BorderRadius.circular(10),
                     ),
                   ),
-                  onPressed: () async {
-                    if (isLogin) {
-                      await auth.signIn (
-                        emailController.text.trim(),
-                        passwordController.text.trim(),
-                      );
-                    } else {
-                      await auth.signUp(
-                        emailController.text.trim(),
-                        passwordController.text.trim(),
-                      );
-                    }
-                  },
+                 onPressed: () async {
+                  final email = emailController.text.trim();
+                  final pass = passwordController.text.trim();
+
+                  String? errorMessage;
+
+                  if (isLogin) {
+                    errorMessage = await auth.signIn(email, pass);
+                  } else {
+                    errorMessage = await auth.signUp(email, pass);
+                  }
+
+                  if (errorMessage == null) {
+                    // SUCESSO → navega pra Home
+                    if (!mounted) return;
+                    Navigator.pushReplacementNamed(context, '/home');
+                  } else {
+                    // ERRO → mostra popup
+                    if (!mounted) return;
+
+                    showDialog(
+                      context: context,
+                      builder: (_) => AlertDialog(
+                        title: const Text("Erro"),
+                        content: Text(errorMessage!),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.pop(context),
+                            child: const Text("OK"),
+                          ),
+                        ],
+                      ),
+                    );
+                  }
+                },
                   child: Text(
                     isLogin ? "Entrar" : "Criar Conta",
                     style: const TextStyle(fontSize: 17, color: Colors.white),

@@ -7,13 +7,12 @@ import 'providers/data_provider.dart';
 // import 'screens/splash_screen.dart';
 import 'routes/routes.dart';
 
-// Se você usou flutterfire_cli, importe o arquivo firebase_options.dart
 import 'firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform, // descomente se usar flutterfire CLI
+    options: DefaultFirebaseOptions.currentPlatform, 
   );
   await Hive.initFlutter();
   await Hive.openBox('servicesBox');

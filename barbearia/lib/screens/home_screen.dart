@@ -20,6 +20,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final dp = Provider.of<DataProvider>(context);
+    
     return Scaffold(
       appBar: AppBar(title: const Text('Studio Pro Barber')),
       body: dp.loading ? const Center(child: CircularProgressIndicator()) : ListView(
