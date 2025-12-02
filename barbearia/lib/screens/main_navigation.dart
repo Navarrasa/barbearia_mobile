@@ -3,30 +3,42 @@ import 'package:provider/provider.dart';
 
 import '../providers/auth_provider.dart';
 import 'home_screen.dart';
-import 'services_screen.dart';
+import 'product_screen.dart';
 import 'appointment_screen.dart';
-import 'profile_screen.dart';
 import 'register_screen.dart';
 
-class RootScreen extends StatefulWidget {
-  const RootScreen({super.key});
+class MainNavigation extends StatefulWidget {
+  final int initialIndex;
+  const MainNavigation({super.key, this.initialIndex = 0});
 
   @override
-  State<RootScreen> createState() => _RootScreenState();
+  State<MainNavigation> createState() => _MainNavigationState();
 }
 
-class _RootScreenState extends State<RootScreen> {
-  int _index = 0;
+class _MainNavigationState extends State<MainNavigation> {
+  late int _index;
 
   @override
+  void initState() {
+    super.initState();
+    _index = widget.initialIndex;
+  }
+
+  @override
+  
   Widget build(BuildContext context) {
     final auth = Provider.of<AuthProvider>(context);
 
+    // Se o usuário não estiver logado, sempre exibe LoginScreen.
+    if (!auth.isLoggedIn) {
+      return const LoginRegisterScreen();
+    }
+
     final screens = [
       const HomeScreen(),
-      const ServicesScreen(),
+      const ProductsScreen(),
       const AppointmentScreen(),
-      auth.isLoggedIn ? const ProfileScreen() : const RegisterScreen()
+      const LoginRegisterScreen(),
     ];
 
     return Scaffold(
@@ -36,24 +48,31 @@ class _RootScreenState extends State<RootScreen> {
         currentIndex: _index,
         selectedItemColor: const Color(0xFF1d2647),
         unselectedItemColor: Colors.grey,
-        onTap: (i) => setState(() => _index = i),
-
+        onTap: (i) {
+          if (i == 3) {
+            // Logout
+            auth.signOut();
+            setState(() => _index = 0);
+            return;
+          }
+          setState(() => _index = i);
+        },
         items: [
           const BottomNavigationBarItem(
             icon: Icon(Icons.home),
             label: "Home",
           ),
           const BottomNavigationBarItem(
-            icon: Icon(Icons.cut),
-            label: "Cortes",
+            icon: Icon(Icons.store),
+            label: "Produtos",
           ),
           const BottomNavigationBarItem(
             icon: Icon(Icons.calendar_month),
             label: "Agendar",
           ),
-          BottomNavigationBarItem(
-            icon: Icon(auth.isLoggedIn ? Icons.person : Icons.login),
-            label: auth.isLoggedIn ? "Perfil" : "Login",
+          const BottomNavigationBarItem(
+            icon: Icon(Icons.logout),
+            label: "Sair",
           ),
         ],
       ),

@@ -3,7 +3,6 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:provider/provider.dart';
 import 'providers/auth_provider.dart';
-import 'providers/data_provider.dart';
 // import 'screens/splash_screen.dart';
 import 'routes/routes.dart';
 
@@ -27,7 +26,6 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => AuthProvider()),
-        ChangeNotifierProvider(create: (_) => DataProvider()),
       ],
       child: MaterialApp(
         title: 'Studio Pro Barber',

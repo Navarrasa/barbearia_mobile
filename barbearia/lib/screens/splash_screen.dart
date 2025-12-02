@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:barbearia/routes/routes.dart';
+import 'package:barbearia/screens/main_navigation.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -17,7 +18,7 @@ class _SplashScreenState extends State<SplashScreen> {
     super.initState();
 
     // Delay de 2 segundos antes de redirecionar
-    Timer(const Duration(seconds: 2), _checkLoginStatus);
+    Timer(const Duration(seconds: 4), _checkLoginStatus);
   }
 
   void _checkLoginStatus() {
@@ -25,7 +26,10 @@ class _SplashScreenState extends State<SplashScreen> {
 
     if (user != null) {
       // Usuário logado → vai para Home
-      Navigator.pushReplacementNamed(context, AppRoutes.home);
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const MainNavigation()),
+      );
     } else {
       // Usuário NÃO logado → vai para Login
       Navigator.pushReplacementNamed(context, AppRoutes.loginRegister);
