@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import '../services/cutSearch.dart';
 import '../models/service_model.dart';
-import 'appointment_screen.dart';
+import '../services/cutSearch.dart';
 
 class ProductsScreen extends StatelessWidget {
   const ProductsScreen({super.key});
@@ -23,6 +22,10 @@ class ProductsScreen extends StatelessWidget {
             return const Center(child: Text("Erro ao carregar cortes"));
           }
 
+          if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return const Center(child: Text("Nenhum corte disponível"));
+          }
+
           final cortes = snapshot.data!;
 
           return ListView.builder(
@@ -31,27 +34,80 @@ class ProductsScreen extends StatelessWidget {
             itemBuilder: (context, i) {
               final c = cortes[i];
 
-              return Card(
-                elevation: 3,
-                margin: const EdgeInsets.only(bottom: 16),
-                child: ListTile(
-                  leading: Image.network(
-                    c.imageUrl!,
-                    width: 60,
-                    height: 60,
-                    fit: BoxFit.cover,
-                  ),
-                  title: Text(c.title),
-                  subtitle: Text("R\$ ${c.price.toStringAsFixed(2)}"),
-
+              return Center(
+                child: GestureDetector(
                   onTap: () {
-                    Navigator.push(
+                    Navigator.pushNamed(
                       context,
-                      MaterialPageRoute(
-                        builder: (_) => AppointmentScreen(service: c),
-                      ),
+                      '/appointment/create',
+                      arguments: c,
                     );
                   },
+                  child: Container(
+                    width: 350,
+                    padding: const EdgeInsets.all(16),
+                    margin: const EdgeInsets.only(bottom: 20),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.1),
+                          blurRadius: 8,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+
+                    child: Row(
+                      children: [
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(12),
+                          child: SizedBox(
+                            width: 80,
+                            height: 80,
+                            child: Image.network(
+                              c.imagem,
+                              fit: BoxFit.cover,
+
+                              // 🔥 impede a imagem quebrada de explodir a UI
+                              errorBuilder: (_, __, ___) => Container(
+                                color: Colors.grey[300],
+                                child: const Icon(Icons.broken_image, size: 40),
+                              ),
+                            ),
+                          ),
+                        ),
+
+                        const SizedBox(width: 16),
+
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                c.nome,
+                                style: const TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+
+                              const SizedBox(height: 6),
+
+                              Text(
+                                "R\$ ${c.preco.toStringAsFixed(2)}",
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  color: Colors.black54,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               );
             },

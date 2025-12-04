@@ -1,38 +1,22 @@
 class ServiceModel {
   final String id;
-  final String title;
-  final String description;
-  final double price;
-  final int durationMinutes;
-  final String? imageUrl;
+  final String nome;
+  final double preco;
+  final String imagem;
 
   ServiceModel({
     required this.id,
-    required this.title,
-    required this.description,
-    required this.price,
-    required this.durationMinutes,
-    this.imageUrl,
+    required this.nome,
+    required this.preco,
+    required this.imagem,
   });
 
   factory ServiceModel.fromMap(Map<String, dynamic> map, String id) {
     return ServiceModel(
       id: id,
-      title: map['title'] ?? '',
-      description: map['description'] ?? '',
-      price: (map['price'] ?? 0).toDouble(),
-      durationMinutes: (map['durationMinutes'] ?? 30) as int,
-      imageUrl: map['imageUrl'],
+      nome: map['nome'] ?? "Sem nome",
+      preco: (map['preco'] ?? 0).toDouble(),
+      imagem: map['imagem'] ?? "",
     );
-  }
-
-  Map<String, dynamic> toMap() {
-    return {
-      'title': title,
-      'description': description,
-      'price': price,
-      'durationMinutes': durationMinutes,
-      'imageUrl': imageUrl,
-    };
   }
 }

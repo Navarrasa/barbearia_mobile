@@ -1,19 +1,24 @@
+import 'package:barbearia/screens/edit_appointment_screen.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import '../models/service_model.dart';
 import '../screens/appointment_screen.dart';
 import '../screens/home_screen.dart';
 import '../screens/splash_screen.dart';
 import '../screens/register_screen.dart';
+import '../screens/CreateAppointmentScreen.dart';
 
 class AppRoutes {
   static const String splash = '/';
   static const String login = '/login';
   static const String loginRegister = '/register';
   static const String home = '/home';
-  static const String appointment = '/appointment';
+  static const String appointment = '/appointment'; // LISTAGEM
+  static const String appointmentCreate = '/appointment/create'; // CRIAÇÃO
 
   static Route<dynamic>? onGenerateRoute(RouteSettings settings) {
     switch (settings.name) {
+
       case splash:
         return MaterialPageRoute(builder: (_) => const SplashScreen());
 
@@ -24,9 +29,18 @@ class AppRoutes {
         return MaterialPageRoute(builder: (_) => const HomeScreen());
 
       case appointment:
+        return MaterialPageRoute(builder: (_) => const AppointmentScreen());
+
+      case "/editAppointment":
+      final doc = settings.arguments as DocumentSnapshot;
+      return MaterialPageRoute(
+        builder: (_) => EditAppointmentScreen(doc: doc),
+      );
+
+      case appointmentCreate:
         final service = settings.arguments as ServiceModel;
         return MaterialPageRoute(
-          builder: (_) => AppointmentScreen(service: service),
+          builder: (_) => CreateAppointmentScreen(service: service),
         );
     }
 

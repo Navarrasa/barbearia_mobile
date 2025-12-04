@@ -1,13 +1,31 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
+import 'package:cloud_firestore/cloud_firestore.dart';
 import '../providers/auth_provider.dart';
 
 class AppointmentScreen extends StatelessWidget {
-  final dynamic service; // opcional — quando vem da ProductsScreen
+  const AppointmentScreen({super.key});
 
-  const AppointmentScreen({super.key, this.service});
+  String formatDate(dynamic date) {
+    if (date is Timestamp) {
+      final d = date.toDate();
+      return "${d.day.toString().padLeft(2, '0')}/"
+            "${d.month.toString().padLeft(2, '0')}/"
+            "${d.year}";
+    }
+
+    if (date is String) {
+      // caso esteja salvo como ISO8601 (2025-12-03T00:00:00.000)
+      final d = DateTime.tryParse(date);
+      if (d != null) {
+        return "${d.day.toString().padLeft(2, '0')}/"
+              "${d.month.toString().padLeft(2, '0')}/"
+              "${d.year}";
+      }
+    }
+
+    return date.toString();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -26,9 +44,7 @@ class AppointmentScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          auth.isAdmin ? "Todos os Agendamentos" : "Meus Agendamentos",
-        ),
+        title: Text(auth.isAdmin ? "Todos os Agendamentos" : "Meus Agendamentos"),
       ),
 
       body: StreamBuilder(
@@ -40,9 +56,11 @@ class AppointmentScreen extends StatelessWidget {
 
           if (!snap.hasData || snap.data!.docs.isEmpty) {
             return Center(
-              child: Text(auth.isAdmin
-                  ? "Nenhum agendamento encontrado."
-                  : "Você não tem agendamentos ainda."),
+              child: Text(
+                auth.isAdmin
+                    ? "Nenhum agendamento encontrado."
+                    : "Você ainda não fez nenhum agendamento.",
+              ),
             );
           }
 
@@ -51,28 +69,24 @@ class AppointmentScreen extends StatelessWidget {
           return ListView.builder(
             padding: const EdgeInsets.all(12),
             itemCount: docs.length,
-            itemBuilder: (context, index) {
-              final a = docs[index].data() as Map<String, dynamic>;
-              final id = docs[index].id;
-
-              final date = a["date"];
-              final userId = a["userId"];
-              final serviceName = a["serviceName"];
+            itemBuilder: (context, i) {
+              final doc = docs[i];
+              final data = doc.data() as Map<String, dynamic>;
 
               return Card(
                 child: ListTile(
-                  title: Text(serviceName ?? "Serviço"),
-                  subtitle: Text(date ?? "Sem data"),
+                  title: Text(data["serviceName"]),
+                  subtitle: Text(formatDate(data["date"])),
 
-                  trailing: auth.isAdmin
-                      ? IconButton(
-                          icon: const Icon(Icons.delete, color: Colors.red),
-                          onPressed: () => deleteAppointment(id),
-                        )
-                      : IconButton(
-                          icon: const Icon(Icons.edit),
-                          onPressed: () => editAppointment(context, id, date),
-                        ),
+                  onTap: auth.isAdmin
+                      ? () {
+                          Navigator.pushNamed(
+                            context,
+                            "/editAppointment",
+                            arguments: doc,
+                          );
+                        }
+                      : null,
                 ),
               );
             },
@@ -80,33 +94,5 @@ class AppointmentScreen extends StatelessWidget {
         },
       ),
     );
-  }
-
-  // ADMIN remove
-  Future<void> deleteAppointment(String id) async {
-    await FirebaseFirestore.instance
-        .collection("appointments")
-        .doc(id)
-        .delete();
-  }
-
-  // USER edita horário
-  Future<void> editAppointment(
-      BuildContext context, String id, String oldDate) async {
-    final newDate = await showDatePicker(
-      context: context,
-      initialDate: DateTime.parse(oldDate),
-      firstDate: DateTime.now(),
-      lastDate: DateTime(2030),
-    );
-
-    if (newDate == null) return;
-
-    await FirebaseFirestore.instance
-        .collection("appointments")
-        .doc(id)
-        .update({
-      "date": newDate.toString(),
-    });
   }
 }

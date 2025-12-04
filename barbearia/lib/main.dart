@@ -31,7 +31,6 @@ class MyApp extends StatelessWidget {
         title: 'Studio Pro Barber',
         theme: ThemeData(
           primaryColor: const Color(0xFF1d2647),
-          scaffoldBackgroundColor: const Color(0xFF121212),
           fontFamily: 'Inter',
         ),
         initialRoute: '/',

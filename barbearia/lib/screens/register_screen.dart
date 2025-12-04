@@ -215,7 +215,7 @@ class _LoginRegisterScreenState extends State<LoginRegisterScreen> {
                           if (isLogin) {
                             error = await auth.login(email, pass);
                           } else {
-                            error = await auth.register(name, email, pass);
+                            error = await auth.register(email, pass, name);
                           }
 
                           if (error == null) {

@@ -13,6 +13,6 @@ class CutsService {
       return list.map((e) => ServiceModel.fromMap(e, e['id'].toString())).toList();
     } else {
       throw Exception("Falha ao carregar dados dos cortes");
+      }
     }
   }
-}
